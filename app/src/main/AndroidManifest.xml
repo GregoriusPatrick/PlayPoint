@@ -12,7 +12,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.PlayPoint">
         <activity
-            android:name=".SettingsActivity"
+            android:name=".HistoryActivity"
             android:exported="false" />
         <activity
             android:name=".ProfileActivity"

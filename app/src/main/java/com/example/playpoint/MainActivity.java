@@ -61,7 +61,7 @@ public class MainActivity extends AppCompatActivity {
                     return true;
                 } else if (itemId == R.id.navigation_settings) {
                     Toast.makeText(MainActivity.this, "Settings selected", Toast.LENGTH_SHORT).show();
-                    Intent intent = new Intent(MainActivity.this, SettingsActivity.class);
+                    Intent intent = new Intent(MainActivity.this, HistoryActivity.class);
                     startActivity(intent);
                     return true;
                 }
