@@ -3,6 +3,8 @@ package com.example.playpoint;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
@@ -28,6 +30,33 @@ public class ProfileActivity extends AppCompatActivity {
             return insets;
         });
 
+        TextView voucherCode = findViewById(R.id.voucher_code);
+        voucherCode.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(ProfileActivity.this, RedeemCodeActivity.class);
+                startActivity(intent);
+            }
+        });
+
+        TextView customerService = findViewById(R.id.customer_servicer);
+        customerService.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(ProfileActivity.this, CsActivity.class);
+                startActivity(intent);
+            }
+        });
+
+        TextView settingsProfile = findViewById(R.id.settings_profile);
+        settingsProfile.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(ProfileActivity.this, SettingActivity.class);
+                startActivity(intent);
+            }
+        });
+
         BottomNavigationView bottomNavigationView = findViewById(R.id.bottom_navigation);
 
         bottomNavigationView.setOnItemSelectedListener(new NavigationBarView.OnItemSelectedListener() {
@@ -41,7 +70,7 @@ public class ProfileActivity extends AppCompatActivity {
                     return true;
                 } else if (itemId == R.id.navigation_settings) {
                     Toast.makeText(ProfileActivity.this, "Settings selected", Toast.LENGTH_SHORT).show();
-                    Intent intent = new Intent(ProfileActivity.this, HistoryActivity.class);
+                    Intent intent = new Intent(ProfileActivity.this, SettingActivity.class);
                     startActivity(intent);
                     return true;
                 }

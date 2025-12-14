@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">PlayPoint</string>
+    <string-array name="games_array">
+        <item>Mobile Legends Bang Bang</item>
+        <item>Roblox</item>
+    </string-array>
 </resources>

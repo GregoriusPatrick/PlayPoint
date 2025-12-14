@@ -12,6 +12,15 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.PlayPoint">
         <activity
+            android:name=".SettingActivity"
+            android:exported="false" />
+        <activity
+            android:name=".CsActivity"
+            android:exported="false" />
+        <activity
+            android:name=".RedeemCodeActivity"
+            android:exported="false" />
+        <activity
             android:name=".HistoryActivity"
             android:exported="false" />
         <activity
