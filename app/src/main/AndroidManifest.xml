@@ -12,6 +12,12 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.PlayPoint">
         <activity
+            android:name=".game2Activity"
+            android:exported="false" />
+        <activity
+            android:name=".game1Activity"
+            android:exported="false" />
+        <activity
             android:name=".SettingActivity"
             android:exported="false" />
         <activity
