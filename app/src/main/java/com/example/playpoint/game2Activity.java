@@ -2,25 +2,39 @@ package com.example.playpoint;
 
 import android.graphics.Color;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.GridLayout;
 import android.widget.LinearLayout;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 import com.google.android.material.card.MaterialCardView;
+import com.google.firebase.firestore.FieldValue;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class game2Activity extends AppCompatActivity {
+
+    private FirebaseFirestore db;
+    private GameItem selectedItem = null;
+    private MaterialCardView selectedCardView = null;
 
     // Kelas sederhana untuk menyimpan data item
     private static class GameItem {
@@ -44,7 +58,10 @@ public class game2Activity extends AppCompatActivity {
             return insets;
         });
 
-        // 1. Data untuk item Roblox (8 item)
+        // Inisialisasi Firestore
+        db = FirebaseFirestore.getInstance();
+
+        // Data untuk item Roblox (8 item)
         List<GameItem> items = new ArrayList<>();
         items.add(new GameItem("80 Robux", "Rp 15.000"));
         items.add(new GameItem("400 Robux", "Rp 75.000"));
@@ -57,16 +74,78 @@ public class game2Activity extends AppCompatActivity {
 
         GridLayout gridLayout = findViewById(R.id.item_selection_grid);
 
-        // 2. Loop melalui data dan buat CardView untuk setiap item
         for (GameItem item : items) {
             MaterialCardView cardView = createItemCard(item);
             gridLayout.addView(cardView);
         }
+
+        // Listener untuk tombol konfirmasi pembayaran
+        Button confirmButton = findViewById(R.id.confirm_payment_button);
+        confirmButton.setOnClickListener(v -> saveTransactionToFirestore());
+    }
+
+    private void saveTransactionToFirestore() {
+        EditText gameIdInput = findViewById(R.id.game_id_input);
+        RadioGroup paymentGroup = findViewById(R.id.payment_method_group);
+
+        String gameId = gameIdInput.getText().toString().trim();
+        int selectedPaymentId = paymentGroup.getCheckedRadioButtonId();
+
+        // Validasi input
+        if (gameId.isEmpty()) {
+            Toast.makeText(this, "Username Roblox tidak boleh kosong", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        if (selectedItem == null) {
+            Toast.makeText(this, "Silakan pilih item terlebih dahulu", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        if (selectedPaymentId == -1) {
+            Toast.makeText(this, "Silakan pilih metode pembayaran", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        RadioButton selectedPaymentButton = findViewById(selectedPaymentId);
+        String paymentMethod = selectedPaymentButton.getText().toString();
+
+        // Membuat data untuk disimpan
+        Map<String, Object> transaction = new HashMap<>();
+        transaction.put("game", "Roblox");
+        transaction.put("gameId", gameId);
+        transaction.put("itemName", selectedItem.name);
+        transaction.put("itemPrice", selectedItem.price);
+        transaction.put("paymentMethod", paymentMethod);
+        transaction.put("timestamp", FieldValue.serverTimestamp()); // Menambahkan waktu transaksi
+
+        // Menyimpan data ke Firestore
+        db.collection("transactions")
+                .add(transaction)
+                .addOnSuccessListener(documentReference -> {
+                    new AlertDialog.Builder(game2Activity.this)
+                            .setTitle("Transaction Success")
+                            .setMessage("Terima kasih! Transaksi Anda telah berhasil dicatat.")
+                            .setPositiveButton("OK", (dialog, which) -> {
+                                // Kosongkan input setelah pengguna menekan OK
+                                gameIdInput.setText("");
+                                paymentGroup.clearCheck();
+                                if (selectedCardView != null) {
+                                    selectedCardView.setStrokeColor(Color.LTGRAY);
+                                }
+                                selectedItem = null;
+                                selectedCardView = null;
+                            })
+                            .setIcon(android.R.drawable.ic_dialog_info)
+                            .show();
+                })
+                .addOnFailureListener(e -> {
+                    Toast.makeText(this, "Gagal menyimpan transaksi.", Toast.LENGTH_SHORT).show();
+                    Log.w("FirestoreError", "Error adding document", e);
+                });
     }
 
     private MaterialCardView createItemCard(GameItem item) {
-        // Membuat CardView secara programatis
         MaterialCardView cardView = new MaterialCardView(this);
+        // ... (kode styling card tetap sama)
         GridLayout.LayoutParams params = new GridLayout.LayoutParams();
         params.width = 0;
         params.setMargins(8, 8, 8, 8);
@@ -78,7 +157,6 @@ public class game2Activity extends AppCompatActivity {
         cardView.setClickable(true);
         cardView.setFocusable(true);
 
-        // LinearLayout di dalam CardView
         LinearLayout linearLayout = new LinearLayout(this);
         linearLayout.setOrientation(LinearLayout.VERTICAL);
         linearLayout.setPadding(32, 32, 32, 32);
@@ -98,10 +176,19 @@ public class game2Activity extends AppCompatActivity {
         linearLayout.addView(itemPrice);
         cardView.addView(linearLayout);
 
-        // Menambahkan listener untuk memberikan feedback saat di-klik
+        // Listener untuk memilih item
         cardView.setOnClickListener(v -> {
+            // Reset warna card yang dipilih sebelumnya
+            if (selectedCardView != null) {
+                selectedCardView.setStrokeColor(Color.LTGRAY);
+            }
+
+            // Set item & card yang baru dipilih
+            selectedItem = item;
+            selectedCardView = cardView;
+            selectedCardView.setStrokeColor(getColor(com.google.android.material.R.color.design_default_color_primary)); // Warna highlight
+
             Toast.makeText(game2Activity.this, item.name + " selected", Toast.LENGTH_SHORT).show();
-            // (Opsional) Tambahkan logika untuk menyorot item yang dipilih
         });
 
         return cardView;

@@ -2,7 +2,9 @@ package com.example.playpoint;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.MenuItem;
+import android.widget.ListView;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
@@ -14,8 +16,19 @@ import androidx.core.view.WindowInsetsCompat;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationBarView;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.Query;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class HistoryActivity extends AppCompatActivity {
+
+    private FirebaseFirestore db;
+    private ListView listView;
+    private HistoryAdapter adapter;
+    private List<Transaction> transactionList = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -28,6 +41,14 @@ public class HistoryActivity extends AppCompatActivity {
             return insets;
         });
 
+        listView = findViewById(R.id.history_list_view);
+        adapter = new HistoryAdapter(this, transactionList);
+        listView.setAdapter(adapter);
+
+        db = FirebaseFirestore.getInstance();
+        fetchTransactionHistory();
+
+        // --- Menambahkan Logika Navigasi ---
         BottomNavigationView bottomNavigationView = findViewById(R.id.bottom_navigation);
 
         bottomNavigationView.setOnItemSelectedListener(new NavigationBarView.OnItemSelectedListener() {
@@ -48,5 +69,23 @@ public class HistoryActivity extends AppCompatActivity {
                 return false;
             }
         });
+    }
+
+    private void fetchTransactionHistory() {
+        db.collection("transactions")
+                .orderBy("timestamp", Query.Direction.DESCENDING) // Urutkan berdasarkan waktu, terbaru di atas
+                .get()
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        transactionList.clear();
+                        for (QueryDocumentSnapshot document : task.getResult()) {
+                            Transaction transaction = document.toObject(Transaction.class);
+                            transactionList.add(transaction);
+                        }
+                        adapter.notifyDataSetChanged(); // Beri tahu adapter bahwa data telah berubah
+                    } else {
+                        Log.d("HistoryActivity", "Error getting documents: ", task.getException());
+                    }
+                });
     }
 }

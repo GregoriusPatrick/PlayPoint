@@ -8,52 +8,67 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
+
+import com.google.firebase.auth.FirebaseAuth;
 
 public class LoginActivity extends AppCompatActivity {
 
-    private EditText emailEditText;
-    private EditText passwordEditText;
+    private EditText emailInput, passwordInput;
     private Button loginButton;
-    private TextView registerButton;
+    private TextView registerText;
+    private FirebaseAuth mAuth;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        EdgeToEdge.enable(this);
         setContentView(R.layout.activity_login);
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
-            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
-            return insets;
-        });
 
-        emailEditText = findViewById(R.id.email);
-        passwordEditText = findViewById(R.id.password);
+        // Inisialisasi Firebase Auth
+        mAuth = FirebaseAuth.getInstance();
+
+        emailInput = findViewById(R.id.email);
+        passwordInput = findViewById(R.id.password);
         loginButton = findViewById(R.id.login);
-        registerButton = findViewById(R.id.register);
+        registerText = findViewById(R.id.register);
 
         loginButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String email = emailEditText.getText().toString();
-                String password = passwordEditText.getText().toString();
-
-                // TODO: Implement login logic here
-                Toast.makeText(LoginActivity.this, "Login berhasil!", Toast.LENGTH_SHORT).show();
+                loginUser();
             }
         });
 
-        registerButton.setOnClickListener(new View.OnClickListener() {
+        registerText.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(LoginActivity.this, RegisterActivity.class);
-                startActivity(intent);
+                startActivity(new Intent(LoginActivity.this, RegisterActivity.class));
             }
         });
+    }
+
+    private void loginUser() {
+        String email = emailInput.getText().toString().trim();
+        String password = passwordInput.getText().toString().trim();
+
+        if (email.isEmpty() || password.isEmpty()) {
+            Toast.makeText(this, "Please enter email and password", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        // Proses Login dengan Firebase
+        mAuth.signInWithEmailAndPassword(email, password)
+                .addOnCompleteListener(this, task -> {
+                    if (task.isSuccessful()) {
+                        // Login berhasil
+                        Toast.makeText(LoginActivity.this, "Login Successful", Toast.LENGTH_SHORT).show();
+                        startActivity(new Intent(LoginActivity.this, MainActivity.class));
+                        finish();
+                    } else {
+                        // Jika gagal
+                        Toast.makeText(LoginActivity.this, "Login Failed: " + task.getException().getMessage(),
+                                Toast.LENGTH_LONG).show();
+                    }
+                });
     }
 }

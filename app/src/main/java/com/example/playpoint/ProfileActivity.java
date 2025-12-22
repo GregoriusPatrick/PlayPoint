@@ -3,7 +3,6 @@ package com.example.playpoint;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.MenuItem;
-import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -15,7 +14,8 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
-import com.google.android.material.navigation.NavigationBarView;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 
 public class ProfileActivity extends AppCompatActivity {
 
@@ -24,58 +24,57 @@ public class ProfileActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_profile);
+
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
 
-        TextView voucherCode = findViewById(R.id.voucher_code);
-        voucherCode.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(ProfileActivity.this, RedeemCodeActivity.class);
-                startActivity(intent);
+        // Tampilkan Nama Pengguna atau "Guest"
+        TextView usernameText = findViewById(R.id.username_text);
+        FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
+
+        if (currentUser != null) {
+            String name = currentUser.getDisplayName();
+            if (name != null && !name.isEmpty()) {
+                usernameText.setText(name);
+            } else {
+                usernameText.setText(currentUser.getEmail());
             }
+        } else {
+            usernameText.setText("Guest User");
+        }
+
+        // Navigasi ke Settings
+        findViewById(R.id.settings_profile).setOnClickListener(v -> {
+            startActivity(new Intent(ProfileActivity.this, SettingActivity.class));
         });
 
-        TextView customerService = findViewById(R.id.customer_servicer);
-        customerService.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(ProfileActivity.this, CsActivity.class);
-                startActivity(intent);
-            }
+        // Navigasi ke Redeem Voucher (contoh)
+        findViewById(R.id.voucher_code).setOnClickListener(v -> {
+            startActivity(new Intent(ProfileActivity.this, RedeemCodeActivity.class));
         });
 
-        TextView settingsProfile = findViewById(R.id.settings_profile);
-        settingsProfile.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(ProfileActivity.this, SettingActivity.class);
-                startActivity(intent);
-            }
+        findViewById(R.id.customer_servicer).setOnClickListener(v -> {
+            startActivity(new Intent(ProfileActivity.this, CsActivity.class));
+
+
         });
+
 
         BottomNavigationView bottomNavigationView = findViewById(R.id.bottom_navigation);
-
-        bottomNavigationView.setOnItemSelectedListener(new NavigationBarView.OnItemSelectedListener() {
-            @Override
-            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-                int itemId = item.getItemId();
-                if (itemId == R.id.navigation_home) {
-                    Toast.makeText(ProfileActivity.this, "Home selected", Toast.LENGTH_SHORT).show();
-                    Intent intent = new Intent(ProfileActivity.this, MainActivity.class);
-                    startActivity(intent);
-                    return true;
-                } else if (itemId == R.id.navigation_settings) {
-                    Toast.makeText(ProfileActivity.this, "Settings selected", Toast.LENGTH_SHORT).show();
-                    Intent intent = new Intent(ProfileActivity.this, SettingActivity.class);
-                    startActivity(intent);
-                    return true;
-                }
-                return false;
+        bottomNavigationView.setSelectedItemId(R.id.navigation_profile);
+        bottomNavigationView.setOnItemSelectedListener(item -> {
+            int itemId = item.getItemId();
+            if (itemId == R.id.navigation_home) {
+                startActivity(new Intent(ProfileActivity.this, MainActivity.class));
+                return true;
+            } else if (itemId == R.id.navigation_history) {
+                startActivity(new Intent(ProfileActivity.this, HistoryActivity.class));
+                return true;
             }
+            return false;
         });
     }
 }

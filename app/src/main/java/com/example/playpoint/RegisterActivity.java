@@ -1,50 +1,85 @@
 package com.example.playpoint;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
+
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.auth.UserProfileChangeRequest;
 
 public class RegisterActivity extends AppCompatActivity {
 
-    private EditText usernameEditText;
-    private EditText emailEditText;
-    private EditText passwordEditText;
+    private EditText usernameInput, emailInput, passwordInput;
     private Button registerButton;
+    private FirebaseAuth mAuth;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        EdgeToEdge.enable(this);
         setContentView(R.layout.activity_register);
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
-            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
-            return insets;
-        });
 
-        usernameEditText = findViewById(R.id.username);
-        emailEditText = findViewById(R.id.email);
-        passwordEditText = findViewById(R.id.password);
+        // Inisialisasi Firebase Auth
+        mAuth = FirebaseAuth.getInstance();
+
+        usernameInput = findViewById(R.id.username);
+        emailInput = findViewById(R.id.email);
+        passwordInput = findViewById(R.id.password);
         registerButton = findViewById(R.id.register);
 
         registerButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String username = usernameEditText.getText().toString();
-                String email = emailEditText.getText().toString();
-                String password = passwordEditText.getText().toString();
-
-                // TODO: Implement registration logic here
-                Toast.makeText(RegisterActivity.this, "Registrasi berhasil!", Toast.LENGTH_SHORT).show();
+                registerUser();
             }
         });
+    }
+
+    private void registerUser() {
+        String username = usernameInput.getText().toString().trim();
+        String email = emailInput.getText().toString().trim();
+        String password = passwordInput.getText().toString().trim();
+
+        if (username.isEmpty() || email.isEmpty() || password.isEmpty()) {
+            Toast.makeText(this, "Please fill all fields", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        if (password.length() < 6) {
+            Toast.makeText(this, "Password must be at least 6 characters", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        // Proses Register dengan Firebase
+        mAuth.createUserWithEmailAndPassword(email, password)
+                .addOnCompleteListener(this, task -> {
+                    if (task.isSuccessful()) {
+                        // Register berhasil, simpan username ke profile
+                        FirebaseUser user = mAuth.getCurrentUser();
+                        if (user != null) {
+                            UserProfileChangeRequest profileUpdates = new UserProfileChangeRequest.Builder()
+                                    .setDisplayName(username)
+                                    .build();
+
+                            user.updateProfile(profileUpdates)
+                                    .addOnCompleteListener(updateTask -> {
+                                        if (updateTask.isSuccessful()) {
+                                            Toast.makeText(RegisterActivity.this, "Registration Successful", Toast.LENGTH_SHORT).show();
+                                            startActivity(new Intent(RegisterActivity.this, LoginActivity.class));
+                                            finish();
+                                        }
+                                    });
+                        }
+                    } else {
+                        // Jika gagal
+                        Toast.makeText(RegisterActivity.this, "Registration Failed: " + task.getException().getMessage(),
+                                Toast.LENGTH_LONG).show();
+                    }
+                });
     }
 }
