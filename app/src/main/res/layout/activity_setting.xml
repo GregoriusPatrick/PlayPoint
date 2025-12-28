@@ -8,6 +8,16 @@
     android:padding="16dp"
     tools:context=".SettingActivity">
 
+    <ImageButton
+        android:id="@+id/back_button"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:src="@android:drawable/ic_menu_revert"
+        android:contentDescription="Back"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true" />
+
     <TextView
         android:id="@+id/settings_title"
         android:layout_width="wrap_content"
@@ -68,8 +78,7 @@
             <!-- Username -->
             <RelativeLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="8dp">
+                android:layout_height="wrap_content">
 
                 <TextView
                     android:id="@+id/username_label"
@@ -84,28 +93,6 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="YourUsername"
-                    android:textSize="16sp"
-                    android:layout_alignParentEnd="true"/>
-            </RelativeLayout>
-
-            <!-- Gender -->
-            <RelativeLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
-
-                <TextView
-                    android:id="@+id/gender_label"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Gender"
-                    android:textSize="16sp"
-                    android:layout_alignParentStart="true"/>
-
-                <TextView
-                    android:id="@+id/gender_text"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Not specified"
                     android:textSize="16sp"
                     android:layout_alignParentEnd="true"/>
             </RelativeLayout>

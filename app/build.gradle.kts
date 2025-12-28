@@ -36,11 +36,14 @@ dependencies {
     // Firebase Bill of Materials (BoM)
     implementation(platform("com.google.firebase:firebase-bom:33.1.1"))
 
-    // Firebase Cloud Firestore dependency
+    // Firebase dependencies
     implementation("com.google.firebase:firebase-firestore")
-
-    // Firebase Authentication dependency
     implementation("com.google.firebase:firebase-auth")
+    implementation("com.google.firebase:firebase-storage")
+
+    // Image Loading Library
+    implementation("com.github.bumptech.glide:glide:4.16.0")
+    annotationProcessor("com.github.bumptech.glide:compiler:4.16.0")
 
     implementation(libs.appcompat)
     implementation(libs.material)

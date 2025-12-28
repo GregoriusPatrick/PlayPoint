@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -41,6 +42,10 @@ public class SettingActivity extends AppCompatActivity {
         mAuth = FirebaseAuth.getInstance();
         FirebaseUser currentUser = mAuth.getCurrentUser();
 
+        // Setup Back Button
+        ImageButton backButton = findViewById(R.id.back_button);
+        backButton.setOnClickListener(v -> finish());
+
         Button clearHistoryButton = findViewById(R.id.clear_history_button);
         TextView signOutText = findViewById(R.id.sign_out_text);
         TextView emailText = findViewById(R.id.email_text);
@@ -50,17 +55,17 @@ public class SettingActivity extends AppCompatActivity {
         if (currentUser != null) {
             emailText.setText(currentUser.getEmail());
             usernameText.setText(currentUser.getDisplayName() != null ? currentUser.getDisplayName() : "User");
-            signOutText.setVisibility(View.VISIBLE); // Tampilkan Logout jika Login
+            signOutText.setVisibility(View.VISIBLE);
         } else {
             emailText.setText("Guest");
             usernameText.setText("Guest");
-            signOutText.setVisibility(View.GONE); // Sembunyikan Logout jika Guest
+            signOutText.setVisibility(View.GONE);
         }
 
         clearHistoryButton.setOnClickListener(v -> showClearHistoryConfirmation());
 
         signOutText.setOnClickListener(v -> {
-            mAuth.signOut(); // Proses Logout dari Firebase
+            mAuth.signOut();
             Toast.makeText(SettingActivity.this, "Signed out successfully", Toast.LENGTH_SHORT).show();
             Intent intent = new Intent(SettingActivity.this, MainActivity.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);

@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "2866955096",
+    "project_id": "playpoint-679f0",
+    "storage_bucket": "playpoint-679f0.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:2866955096:android:c5b057669e0f93ea8edb2d",
+        "android_client_info": {
+          "package_name": "com.example.playpoint"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCe2yoP_ZeH-Jxw1CQKh3qcaXVphZnkarU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

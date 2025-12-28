@@ -7,7 +7,7 @@
     android:layout_height="match_parent"
     tools:context=".ProfileActivity">
 
-    <!-- Kontainer utama untuk konten profil, ditempatkan di atas Bottom Navigation -->
+    <!-- Kontainer utama untuk konten profil -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -16,26 +16,66 @@
         android:padding="16dp"
         android:layout_above="@+id/bottom_navigation">
 
-        <!-- Tempat Foto Profil -->
-        <ImageView
-            android:id="@+id/profile_image"
+        <!-- Tempat Foto Profil dengan Tombol Edit -->
+        <FrameLayout
             android:layout_width="120dp"
             android:layout_height="120dp"
-            android:layout_marginTop="32dp"
-            android:src="@drawable/ic_profile"
-            android:scaleType="centerCrop"
-            android:contentDescription="Foto Profil" />
+            android:layout_marginTop="32dp">
+
+            <com.google.android.material.imageview.ShapeableImageView
+                android:id="@+id/profile_image"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:src="@drawable/ic_profile"
+                android:scaleType="centerCrop"
+                app:shapeAppearanceOverlay="@style/CircleImage"
+                android:padding="2dp"
+                app:strokeColor="@android:color/holo_blue_dark"
+                app:strokeWidth="2dp"/>
+
+            <ImageButton
+                android:id="@+id/edit_profile_image_button"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:layout_gravity="bottom|end"
+                android:background="@drawable/circle_bg"
+                android:src="@android:drawable/ic_menu_camera"
+                android:tint="@android:color/white"
+                android:padding="8dp"
+                android:contentDescription="Ubah Foto Profil"
+                android:visibility="gone"/>
+
+        </FrameLayout>
 
         <!-- Username -->
-        <TextView
-            android:id="@+id/username_text"
+        <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
-            android:text="Username"
-            android:textSize="24sp"
-            android:textStyle="bold"
-            android:textColor="?android:attr/textColorPrimary" />
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/username_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Username"
+                android:textSize="24sp"
+                android:textStyle="bold"
+                android:textColor="?android:attr/textColorPrimary" />
+
+            <ImageButton
+                android:id="@+id/edit_username_profile"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:layout_marginStart="8dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:src="@android:drawable/ic_menu_edit"
+                android:tint="@android:color/holo_blue_dark"
+                android:contentDescription="Edit Username"
+                android:visibility="gone" />
+
+        </LinearLayout>
 
         <!-- Divider -->
         <View
@@ -45,7 +85,7 @@
             android:layout_marginTop="24dp"
             android:layout_marginBottom="16dp"/>
 
-        <!-- Opsi Menu (ID Game, Pengaturan, dll) -->
+        <!-- Menu Opsi -->
         <TextView
             android:id="@+id/voucher_code"
             android:layout_width="match_parent"
